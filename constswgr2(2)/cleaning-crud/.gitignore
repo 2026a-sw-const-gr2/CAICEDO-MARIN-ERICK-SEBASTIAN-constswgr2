@@ -1,0 +1,26 @@
+.env
+.env.local
+.env.*.local
+dist
+coverage
+node_modules
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# SQLite Database (No incluir en repositorio)
+*.sqlite
+*.sqlite3
+*.db
+database.sqlite
+database.sqlite-journal
+
+# Build outputs
+*.tsbuildinfo
+build/
+logs/
+*.log
+npm-debug.log*
