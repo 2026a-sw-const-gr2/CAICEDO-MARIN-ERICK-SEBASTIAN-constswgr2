@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import * as winston from 'winston';
 
-// [ADAPTIVE] This logger reads configuration from environment variables
-// [CORRECTIVE] Structured logger with ISO timestamps and severity levels
+// [ADAPTIVE] Logger reads configuration from environment variables
+// [PERFECTIVO] Emits structured JSON logs with level, timestampISO, route, action, productId, message
 @Injectable()
 export class LoggerService {
   private logger: winston.Logger;
@@ -13,7 +13,6 @@ export class LoggerService {
       new winston.transports.Console(),
     ];
 
-    // Optional file logging
     if (process.env.LOG_FILE) {
       transports.push(
         new winston.transports.File({ filename: process.env.LOG_FILE }),
@@ -25,10 +24,13 @@ export class LoggerService {
       format: winston.format.combine(
         winston.format.timestamp({ format: () => new Date().toISOString() }),
         winston.format.printf(({ timestamp, level, message, ...meta }: any) => {
-          const metaString = Object.keys(meta || {}).length
-            ? ` ${JSON.stringify(meta)}`
-            : '';
-          return `[${timestamp}] ${level.toUpperCase()} - ${message}${metaString}`;
+          // Emit fully structured JSON with standard fields at the top level
+          return JSON.stringify({
+            level,
+            timestampISO: timestamp,
+            message,
+            ...meta,
+          });
         }),
       ),
       transports,
@@ -36,16 +38,15 @@ export class LoggerService {
     });
   }
 
-  info(message: string, meta?: any) {
+  info(message: string, meta?: Record<string, any>) {
     this.logger.info(message, meta);
   }
 
-  warn(message: string, meta?: any) {
+  warn(message: string, meta?: Record<string, any>) {
     this.logger.warn(message, meta);
   }
 
-  error(message: string, meta?: any) {
+  error(message: string, meta?: Record<string, any>) {
     this.logger.error(message, meta);
   }
 }
-
